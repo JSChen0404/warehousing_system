@@ -1,0 +1,287 @@
+.form {
+    margin: 2rem auto 0 auto;
+    max-width: 30rem;
+    border: var(--border);
+    font-size: 1.2rem;
+    background: var(--background-color);
+    box-shadow: 0.75rem 0.75rem 0 -0.2rem #026C79; /* x offset / y offset / blur is 0 and spread is -0.2rem */    
+}
+
+
+.form__container {
+    padding: 2rem 1.5rem 1.5rem 1.5rem; 
+}
+
+.form__title {
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-colour);
+    color: var(--text-dark);
+}
+
+@media screen and (min-width: 24.75em) {
+    .form__container {
+        padding-left: 2rem;
+}
+}
+
+@media screen and (min-width: 30em) {
+    .form__container {
+        padding-left: 2.5rem;
+}
+}
+
+.form__hint {
+    background: #e3f2fd;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #2196f3;
+    border-radius: 4px;
+}
+
+.form__hint p {
+    margin: 0;
+    color: #1565c0;
+    font-size: 0.95rem;
+}
+
+.form__row {
+    display: grid;
+    grid-template-columns: 1fr;   /* 手機先 1 欄 */
+    gap: 0.75rem;
+}
+
+@media (min-width: 48em) {        /* >= 768px */
+    .form__row {
+        grid-template-columns: 1fr 1fr;  /* 變 2 欄 */
+    }
+}
+
+@media (min-width: 64em) {        /* >= 1024px */
+    .form__row {
+        grid-template-columns: 1fr 1fr 1fr; /* 變 3 欄 */
+    }
+}
+
+.form__col {
+    flex: 1;
+}
+
+.form__grid {
+    display: grid;
+    grid-template-columns: 1fr;     /* 手機 1 欄 */
+    gap: 0.75rem;
+}
+
+@media (min-width: 48em) {          /* >= 768px */
+    .form__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 64em) {          /* >= 1024px */
+    .form__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.form__checkbox {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 0.75rem;
+
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+/* 放大 checkbox */
+.form__checkbox input[type="checkbox"] {
+  transform: scale(1.4);
+  cursor: pointer;
+}
+
+/* label 不要跑掉 */
+.form__checkbox label {
+  margin: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form__group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+/* 需要橫跨整列的 */
+.span-3 {
+    grid-column: 1 / -1;
+}
+
+.form__label { 
+    margin-bottom: 0.5rem;
+}
+
+.form__field {
+    outline: none; 
+    border: none;
+    border-bottom: 3px solid #fff;
+    font-size: inherit;
+    font-family: inherit;
+
+    padding: 0.5rem 0.5rem;
+    background: var(--background-color);
+}
+
+.form__field:focus {
+    border-bottom: var(--border);
+}
+
+
+.form--add_packing { 
+    margin-top: 2.5rem; 
+}
+
+.form--add_inventory { 
+    max-width: 90rem;
+    margin-top: 2.5rem;
+    margin-bottom: 4rem; 
+}
+
+
+.form--search {
+    max-width: 70rem; 
+    margin-top: 3rem; 
+}
+
+.button--form {
+    margin: 2rem 0 0 auto;
+    padding: 0.75rem 3rem;
+    border: none;
+    background: var(--background-color);
+}
+
+.button--form:hover {
+    background: var(--background-color-hover);
+}
+
+.button-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.form__container--Microsoft {
+    display: flex;
+    justify-content: center; 
+    padding-left: 0;   
+}
+
+/*壓過.button--form的auto，讓按鈕置中*/
+.form__container--Microsoft .button--form {
+    margin-left: 0 !important;
+    
+}
+ 
+.button--Microsoft { 
+    display: flex;
+    justify-content: center; 
+    font-size: 1.1rem;        /* 字變大 */
+    padding: 1rem 3rem;       /* 按鈕變大（最有感） */
+    margin: 0;
+}
+
+.form__small {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;    
+    margin-top: 1rem; 
+}
+
+.form__link {
+    text-decoration: none;
+    color: var(--accent-colour); 
+}
+
+.form__link:hover {
+    color: #d05656;
+}
+
+.form__error { 
+    margin-top: 0.5rem;
+}
+
+.form__error,
+.form__flash {
+    display: block;
+    padding: 0.5rem;
+    color: var(--text);
+}
+
+.form__error,
+.form__flash--danger {
+    color: var(--accent-colour); 
+}
+
+.form__flash {
+    margin: 0.5rem;
+}
+
+.form__flash--success {
+    background: var(--accent-colour-2);
+}
+
+.type-selector { 
+  position: sticky;      
+  top: 85px;                /* 如果有導覽列，請設定導覽列的高度，例如 60px */
+  z-index: 1000;         /* 確保層級高於表單 (form 的 z-index 預設是 auto) */
+  background: #ffffff;   /* 必須有背景色，才不會看到表單穿透 */
+  
+  box-sizing: border-box;
+  margin: 0 auto;        /* 移除 bottom margin，改用 padding 或表單的 margin */
+  width: 100%;           /* 寬度設為 100% 較能完整遮擋後方內容 */
+  padding: 0.5rem 0;       /* 增加上下間距 */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  
+  /* 加上陰影可以增加層次感，讓使用者知道它是浮在上面的 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+.type-selector label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-right: 1rem;
+    color: var(--text-dark);
+}
+
+.type-selector select {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    min-width: 200px;
+    transition: border-color 0.2s ease;
+}
+
+.type-selector select:focus {
+    outline: none;
+    border-color: #2c3e50;
+}
+
+.type-selector select:hover {
+    border-color: #999;
+}
+
+
+
+

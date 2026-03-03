@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+    <div class="form" style="max-width: 50rem;">
+        <div class="form__container">
+            <h2 class="form__title">審核取貨單 #{{ withdrawal.id }}</h2>
+
+            <div class="approval-info">
+                <h3>申請資訊</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">品項貨號：</span>
+                        <span class="info-value">{{ inventory.child_item_code }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">批號/序列號：</span>
+                        <span class="info-value">{{ inventory.batch_or_serial_no }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">裝箱單號：</span>
+                        <span class="info-value">{{ inventory.packing_no }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">單一品項名稱：</span>
+                        <span class="info-value">{{ inventory.child_item_name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">目前庫存：</span>
+                        <span class="info-value">{{ "{:.2f}".format(inventory.quantity) }} {{ inventory.unit }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">申請數量：</span>
+                        <span class="info-value" style="font-weight: 600; color: #d05656;">
+                            {{ "{:.2f}".format(withdrawal.withdrawal_quantity) }} {{ inventory.unit }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">取貨後剩餘：</span>
+                        <span class="info-value">
+                            {{ "{:.2f}".format(inventory.quantity - withdrawal.withdrawal_quantity) }} {{ inventory.unit }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">申請人：</span>
+                        <span class="info-value">{{ withdrawal.requester }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">取貨日期：</span>
+                        <span class="info-value">{{ withdrawal.withdrawal_date }}</span>
+                    </div>
+                    <div class="info-item info-item--full">
+                        <span class="info-label">用途說明：</span>
+                        <span class="info-value">{{ withdrawal.purpose }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" novalidate style="margin-top: 2rem;">
+                {{ form.hidden_tag() }}
+                <div class="form__group">
+                    {{ form.approval_status.label(class_="form__label") }}
+                    {{ form.approval_status(class="form__field") }}
+                </div>
+                <div class="form__group">
+                    {{ form.approval_comment.label(class_="form__label") }}
+                    {{ form.approval_comment(class="form__field", rows=4) }}
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    {{ form.submit(class_="button button--form") }}
+                    <a href="{{ url_for('pages.approval_list') }}"
+                       class="button button--form" style="background: #6c757d;">返回列表</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .approval-info { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .approval-info h3 { margin-top: 0; margin-bottom: 1rem; border-bottom: 2px solid var(--accent-colour); padding-bottom: 0.5rem; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .info-item--full { grid-column: 1 / -1; }
+        .info-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .info-value { font-size: 1rem; }
+        @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } }
+    </style>
+{% endblock %}

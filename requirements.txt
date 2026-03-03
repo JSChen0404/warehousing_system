@@ -1,0 +1,10 @@
+flask
+flask-wtf
+flask-security
+Flask-SQLAlchemy
+WTForms
+psycopg2-binary
+python-dotenv
+passlib
+dataclasses
+msal

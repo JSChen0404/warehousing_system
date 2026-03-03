@@ -1,0 +1,90 @@
+/*for some of CSS codes, I learned from a Udemy cource (Web Developer Bootcamp with Flask and Python in 2024)*/
+
+
+.button--add {
+    display: flex;
+    position: absolute;
+    bottom: 4rem;
+    right: 2rem;
+    height:5rem;
+    width:5rem;
+    border: var(--border);
+    border-radius: 50%;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.75rem;
+    align-items: center;
+    justify-content: center;
+}
+
+@media screen and (min-width: 50em) {
+  html {
+    right: 3rem;
+  }
+}
+
+
+@media screen and (min-width: 60em) {
+  html {
+    right: 4rem;
+  }
+}
+
+
+.button--add:hover {
+    color:var(--text);
+    background-color: var(--accent-colour); 
+}
+
+
+.table {
+    max-width: 50rem;
+    width: 100%;
+    margin-top: 0 auto;
+    border-spacing: 0;    
+}
+
+.table__cell { 
+    padding: 1.25rem 1rem; 
+}
+
+
+.table__cell--header { 
+    text-align: left;
+    padding: 0.5rem 1rem;
+    border-bottom: var(--border) 
+}
+
+
+.table__current_price, 
+.table__unit_cost,
+.table__total_cost,
+.table__quantity,
+.table__market_value,  
+.table__total_change {
+    text-align: right;
+    font-weight: 600;
+}
+
+/*let total change display by positive and negative*/
+.value-positive {
+    color: #e53935;  
+}
+
+
+.value-negative {
+    color: #2e7d32;
+}
+
+
+.change__percent {
+    font-size: 16px; 
+}
+ 
+
+.table__empty {
+    display: block;
+    text-align: center; 
+    font-size: 1.2rem; 
+}

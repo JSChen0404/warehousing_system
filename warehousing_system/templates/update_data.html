@@ -1,0 +1,144 @@
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}" />
+    <style>
+        .editable-table { margin-top: 2rem; }
+        .editable-table input[type="text"],
+        .editable-table input[type="number"],
+        .editable-table input[type="date"] {
+            width: 100%; max-width: 100%; padding: 0.4rem;
+            border: 2px solid #ddd; border-radius: 4px;
+            font-size: 0.85rem; box-sizing: border-box;
+        }
+        .editable-table input:focus { outline: none; border-color: #2c3e50; }
+        .editable-table input[type="checkbox"] { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .readonly-cell { background-color: #f5f5f5; color: #666; }
+        .submit-section {
+            margin-top: 2rem; padding: 1.5rem; background: #f8f9fa;
+            border-radius: 8px; text-align: center;
+        }
+        .btn-submit {
+            padding: 1rem 3rem; background: var(--accent-colour); color: #fff;
+            border: none; border-radius: 6px; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-submit:hover { background: #d05656; }
+        .help-text { margin-top: 1rem; color: var(--text-muted); font-size: 0.95rem; }
+    </style>
+{% endblock %}
+
+{% block main_content %}
+    <!-- 搜尋表單 -->
+    <form name="search" method="post" novalidate class="form form--search">
+        <div class="form__container">
+            <h2 class="form__title">搜尋要更新的資料</h2>
+            <div class="form__hint">
+                <p>填寫一個或多個搜尋條件，找到要修改的資料</p>
+            </div>
+            {{ form.hidden_tag() }}
+            <div class="form__row">
+                <div class="form__col">{{ render_text_field(form.packing_no) }}</div>
+                <div class="form__col">{{ render_text_field(form.purchase_order_no) }}</div>
+                <div class="form__col">{{ render_text_field(form.child_item_code) }}</div>
+            </div>
+            <div class="form__row">
+                <div class="form__col">{{ render_text_field(form.parent_item_name) }}</div>
+                <div class="form__col">{{ render_text_field(form.child_item_name) }}</div>
+            </div>
+            <div>
+                <button type="submit" name="search" class="button button--form">搜尋</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- 可編輯表格 -->
+    {% if results %}
+    <form method="post" class="editable-table">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <section class="page-header">
+            <h2>搜尋結果（共 {{ results|length }} 筆）</h2>
+            <p class="text-muted">直接在表格中修改，完成後點擊「送出更新」</p>
+        </section>
+
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table class="table table-full">
+                    <thead>
+                        <tr>
+                            <th class="table__cell table__cell--header">品項貨號</th>
+                            <th class="table__cell table__cell--header">批號/序列號</th>
+                            <th class="table__cell table__cell--header">裝箱單號</th>
+                            <th class="table__cell table__cell--header">單一品項名稱</th>
+                            <th class="table__cell table__cell--header">到期日</th>
+                            <th class="table__cell table__cell--header">數量</th>
+                            <th class="table__cell table__cell--header">單位</th>
+                            <th class="table__cell table__cell--header">測試數</th>
+                            <th class="table__cell table__cell--header">儲存溫度(°C)</th>
+                            <th class="table__cell table__cell--header">儲存位置</th>
+                            <th class="table__cell table__cell--header">含毒</th>
+                            <th class="table__cell table__cell--header">簽收人</th>
+                            <th class="table__cell table__cell--header">領用日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results %}
+                        <tr>
+                            <td class="table__cell readonly-cell">
+                                {{ item.child_item_code }}
+                                <input type="hidden" name="child_item_code[]" value="{{ item.child_item_code }}">
+                            </td>
+                            <td class="table__cell readonly-cell">
+                                {{ item.batch_or_serial_no }}
+                                <input type="hidden" name="batch_or_serial_no[]" value="{{ item.batch_or_serial_no }}">
+                            </td>
+                            <td class="table__cell readonly-cell">{{ item.packing_no }}</td>
+                            <td class="table__cell">
+                                <input type="text" name="child_item_name[]" value="{{ item.child_item_name }}">
+                            </td>
+                            <td class="table__cell">
+                                <input type="date" name="expiration_date[]" value="{{ item.expiration_date }}">
+                            </td>
+                            <td class="table__cell">
+                                <input type="number" name="quantity[]" value="{{ item.quantity }}" step="0.01" min="0" required>
+                            </td>
+                            <td class="table__cell">
+                                <input type="text" name="unit[]" value="{{ item.unit }}" required>
+                            </td>
+                            <td class="table__cell">
+                                <input type="number" name="test_quantity[]" value="{{ item.test_quantity }}" min="0">
+                            </td>
+                            <td class="table__cell">
+                                <input type="number" name="storage_temperature_c[]" value="{{ item.storage_temperature_c }}" step="0.1">
+                            </td>
+                            <td class="table__cell">
+                                <input type="text" name="storage_location[]" value="{{ item.storage_location }}" placeholder="位置">
+                            </td>
+                            <td class="table__cell table__cell--center">
+                                <input type="checkbox" name="has_toxic_chemical[]"
+                                       value="{{ item.child_item_code }}|{{ item.batch_or_serial_no }}"
+                                       {% if item.has_toxic_chemical %}checked{% endif %}>
+                            </td>
+                            <td class="table__cell">
+                                <input type="text" name="received_by[]" value="{{ item.received_by }}" placeholder="簽收人">
+                            </td>
+                            <td class="table__cell">
+                                <input type="date" name="issue_date[]" value="{{ item.issue_date }}">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="submit-section">
+            <button type="submit" name="update" class="btn-submit">✓ 送出更新</button>
+            <p class="help-text">💡 灰色欄位（品項貨號、批號、裝箱單號）為主鍵無法編輯</p>
+        </div>
+    </form>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,121 @@
+{% from "macros/fields.html" import render_text_field %}
+
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+    <form name="search" method="post" novalidate class="form form--search">
+        <div class="form__container">
+            <h2 class="form__title">搜尋庫存</h2>
+            <div class="form__hint">
+                <p>可填寫一個或多個搜尋條件，系統將尋找符合任一條件的資料</p>
+            </div>
+            {{ form.hidden_tag() }}
+            <div class="form__row">
+                <div class="form__col">{{ render_text_field(form.packing_no) }}</div>
+                <div class="form__col">{{ render_text_field(form.purchase_order_no) }}</div>
+                <div class="form__col">{{ render_text_field(form.batch_or_serial_no) }}</div>
+            </div>
+            <div class="form__row">
+                <div class="form__col">{{ render_text_field(form.parent_item_name) }}</div>
+                <div class="form__col">{{ render_text_field(form.child_item_name) }}</div>
+                <div class="form__col">{{ render_text_field(form.child_item_code) }}</div>
+            </div>
+            <div>{{ form.submit(class_="button button--form") }}</div>
+        </div>
+    </form>
+
+    {% if results %}
+    <section class="page-header">
+        <h2>搜尋結果</h2>
+        <p class="text-muted">共找到 {{ pagination.total if pagination else results|length }} 筆資料
+            {% if pagination %}，目前第 {{ pagination.page }} / {{ pagination.pages }} 頁{% endif %}
+        </p>
+    </section>
+
+    <div class="table-wrapper">
+        <div class="table-container">
+            <table class="table table-full">
+                <thead>
+                    <tr>
+                        <th class="table__cell table__cell--header">品項貨號</th>
+                        <th class="table__cell table__cell--header">批號/序列號</th>
+                        <th class="table__cell table__cell--header">裝箱單號</th>
+                        <th class="table__cell table__cell--header">到貨日</th>
+                        <th class="table__cell table__cell--header">採購單號</th>
+                        <th class="table__cell table__cell--header">貨物名稱</th>
+                        <th class="table__cell table__cell--header">實驗類別</th>
+                        <th class="table__cell table__cell--header">貨號</th>
+                        <th class="table__cell table__cell--header">單一品項名稱</th>
+                        <th class="table__cell table__cell--header">有效期限</th>
+                        <th class="table__cell table__cell--header">數量</th>
+                        <th class="table__cell table__cell--header">單位</th>
+                        <th class="table__cell table__cell--header">測試數</th>
+                        <th class="table__cell table__cell--header">儲存條件(°C)</th>
+                        <th class="table__cell table__cell--header">存放地點</th>
+                        <th class="table__cell table__cell--header">是否有毒化物</th>
+                        <th class="table__cell table__cell--header">簽收人</th>
+                        <th class="table__cell table__cell--header">領用日期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in results %}
+                    <tr>
+                        <td class="table__cell">{{ item.child_item_code }}</td>
+                        <td class="table__cell">{{ item.batch_or_serial_no }}</td>
+                        <td class="table__cell">{{ item.packing_no }}</td>
+                        <td class="table__cell">{{ item.arrival_date or '-' }}</td>
+                        <td class="table__cell">{{ item.purchase_order_no or '-' }}</td>
+                        <td class="table__cell">{{ item.parent_item_name or '-' }}</td>
+                        <td class="table__cell">{{ item.experiment_category or '-' }}</td>
+                        <td class="table__cell">{{ item.parent_item_code or '-' }}</td>
+                        <td class="table__cell">{{ item.child_item_name or '-' }}</td>
+                        <td class="table__cell">{{ item.expiration_date or '-' }}</td>
+                        <td class="table__cell table__cell--number">{{ "{:.2f}".format(item.quantity) }}</td>
+                        <td class="table__cell">{{ item.unit }}</td>
+                        <td class="table__cell table__cell--number">{{ item.test_quantity }}</td>
+                        <td class="table__cell table__cell--number">{{ item.storage_temperature_c or '-' }}</td>
+                        <td class="table__cell">{{ item.storage_location or '-' }}</td>
+                        <td class="table__cell table__cell--center">
+                            {% if item.has_toxic_chemical %}
+                                <span class="badge badge--toxic">是</span>
+                            {% else %}
+                                否
+                            {% endif %}
+                        </td>
+                        <td class="table__cell">{{ item.received_by or '-' }}</td>
+                        <td class="table__cell">{{ item.issue_date or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if pagination and pagination.pages > 1 %}
+    <div class="pagination">
+        <div class="pagination-controls">
+            {% if pagination.has_prev %}
+                <a href="{{ url_for('pages.search', page=1) }}" class="pagination-btn">首頁</a>
+                <a href="{{ url_for('pages.search', page=pagination.prev_num) }}" class="pagination-btn">上一頁</a>
+            {% else %}
+                <span class="pagination-btn pagination-btn--disabled">首頁</span>
+                <span class="pagination-btn pagination-btn--disabled">上一頁</span>
+            {% endif %}
+            <span class="pagination-current">第 {{ pagination.page }} / {{ pagination.pages }} 頁</span>
+            {% if pagination.has_next %}
+                <a href="{{ url_for('pages.search', page=pagination.next_num) }}" class="pagination-btn">下一頁</a>
+                <a href="{{ url_for('pages.search', page=pagination.pages) }}" class="pagination-btn">末頁</a>
+            {% else %}
+                <span class="pagination-btn pagination-btn--disabled">下一頁</span>
+                <span class="pagination-btn pagination-btn--disabled">末頁</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+{% endblock %}

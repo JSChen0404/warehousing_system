@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+    <section class="page-header">
+        <h2>待審核取貨單</h2>
+        <p class="text-muted">共 {{ withdrawals|length }} 筆待審核</p>
+    </section>
+
+    {% if withdrawals %}
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table class="table table-full" style="min-width: 1500px;">
+                    <thead>
+                        <tr>
+                            <th class="table__cell table__cell--header">申請編號</th>
+                            <th class="table__cell table__cell--header">品項貨號</th>
+                            <th class="table__cell table__cell--header">批號/序列號</th>
+                            <th class="table__cell table__cell--header">裝箱單號</th>
+                            <th class="table__cell table__cell--header">單一品項名稱</th>
+                            <th class="table__cell table__cell--header">目前庫存</th>
+                            <th class="table__cell table__cell--header">取貨數量</th>
+                            <th class="table__cell table__cell--header">單位</th>
+                            <th class="table__cell table__cell--header">取貨日期</th>
+                            <th class="table__cell table__cell--header">申請人</th>
+                            <th class="table__cell table__cell--header">用途</th>
+                            <th class="table__cell table__cell--header">申請時間</th>
+                            <th class="table__cell table__cell--header">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in withdrawals %}
+                        <tr>
+                            <td class="table__cell">{{ item.id }}</td>
+                            <td class="table__cell">{{ item.child_item_code }}</td>
+                            <td class="table__cell">{{ item.batch_or_serial_no }}</td>
+                            <td class="table__cell">{{ item.packing_no }}</td>
+                            <td class="table__cell">{{ item.child_item_name }}</td>
+                            <td class="table__cell table__cell--number">
+                                {{ "{:.2f}".format(item.current_quantity) }}
+                                {% if item.current_quantity < item.withdrawal_quantity %}
+                                    <span style="color: red; margin-left: 0.5rem;">⚠️</span>
+                                {% endif %}
+                            </td>
+                            <td class="table__cell table__cell--number">{{ "{:.2f}".format(item.withdrawal_quantity) }}</td>
+                            <td class="table__cell">{{ item.unit }}</td>
+                            <td class="table__cell">{{ item.withdrawal_date }}</td>
+                            <td class="table__cell">{{ item.requester }}</td>
+                            <td class="table__cell">{{ item.purpose }}</td>
+                            <td class="table__cell">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="table__cell table__cell--center">
+                                <a href="{{ url_for('pages.approve_withdrawal', withdrawal_id=item.id) }}"
+                                   class="button button--form" style="padding: 0.5rem 1rem; margin: 0;">
+                                    審核
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <p class="inventory__empty">目前沒有待審核的取貨申請</p>
+    {% endif %}
+{% endblock %}

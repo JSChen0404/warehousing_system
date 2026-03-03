@@ -1,0 +1,14 @@
+{% macro render_text_field(field) %}
+
+<div class="form__group"> 
+    
+    <!-- 動態產生 label 標籤，舉例來說會被轉成 <label class="form__label" for="stock_number">Stock Number</label> -->
+    {{ field.label(class_="form__label") }}
+    <!-- 動態產生 input 欄位，舉例來說會被轉成 <input class="form__field" id="stock_number" name="stock_number" type="text"> -->
+    {{ field(class="form__field") }}
+        {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+</div>
+{% endmacro %}
+

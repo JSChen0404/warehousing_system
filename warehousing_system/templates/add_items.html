@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}" />
+    <style>
+        .summary-box {
+            background: #f0f4f8; padding: 1.5rem; border-radius: 8px;
+            margin-bottom: 2rem; border-left: 4px solid #2c3e50;
+        }
+        .summary-box h3 { margin-top: 0; color: #2c3e50; }
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem;
+        }
+        .summary-label { color: #666; font-size: 0.85rem; }
+        .summary-value { font-weight: 600; }
+        .items-form { margin-top: 1rem; }
+        .items-form input[type="text"],
+        .items-form input[type="number"],
+        .items-form input[type="date"] {
+            width: 100%; padding: 0.5rem; border: 2px solid #ddd;
+            border-radius: 4px; font-size: 0.85rem; box-sizing: border-box;
+        }
+        .items-form input:focus { outline: none; border-color: #2c3e50; }
+        .items-form input[type="checkbox"] { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .child-name-cell { background: #e8f4e8; font-weight: 600; min-width: 150px; }
+        .submit-section {
+            margin-top: 2rem; padding: 1.5rem; background: #f8f9fa;
+            border-radius: 8px; text-align: center;
+        }
+        .btn-submit {
+            padding: 1rem 3rem; background: var(--accent-colour); color: #fff;
+            border: none; border-radius: 6px; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-submit:hover { background: #d05656; }
+        .btn-back {
+            padding: 0.75rem 2rem; background: #6c757d; color: #fff;
+            border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
+            text-decoration: none; display: inline-block;
+        }
+    </style>
+{% endblock %}
+
+{% block main_content %}
+
+<!-- 貨物層級摘要 -->
+<div class="summary-box">
+    <h3>貨物資料摘要</h3>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="summary-label">貨物名稱</div>
+            <div class="summary-value">{{ data.parent_item_name }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">實驗類別</div>
+            <div class="summary-value">{{ data.experiment_category or '-' }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">到貨日</div>
+            <div class="summary-value">{{ data.arrival_date }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">裝箱單號</div>
+            <div class="summary-value">{{ data.packing_no }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">採購單號</div>
+            <div class="summary-value">{{ data.purchase_order_no or '-' }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">貨號</div>
+            <div class="summary-value">{{ data.parent_item_code or '-' }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- 品項明細表單 -->
+<form method="post" class="items-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+
+    <section class="page-header">
+        <h2>Step 2：填寫品項明細</h2>
+        <p class="text-muted">
+            「{{ data.parent_item_name }}」共有 {{ items|length }} 個品項，請填寫各品項的詳細資料。
+            同一品項如有多個批號，請分別填寫多列。
+        </p>
+    </section>
+
+    <div class="table-wrapper">
+        <div class="table-container">
+            <table class="table table-full" style="min-width: 1600px;">
+                <thead>
+                    <tr>
+                        <th class="table__cell table__cell--header">#</th>
+                        <th class="table__cell table__cell--header">單一品項名稱</th>
+                        <th class="table__cell table__cell--header">品項貨號 *</th>
+                        <th class="table__cell table__cell--header">批號/序列號 *</th>
+                        <th class="table__cell table__cell--header">有效期限</th>
+                        <th class="table__cell table__cell--header">數量 *</th>
+                        <th class="table__cell table__cell--header">單位 *</th>
+                        <th class="table__cell table__cell--header">測試數</th>
+                        <th class="table__cell table__cell--header">儲存條件(°C)</th>
+                        <th class="table__cell table__cell--header">存放地點</th>
+                        <th class="table__cell table__cell--header">有毒化物</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td class="table__cell table__cell--center">{{ loop.index }}</td>
+                        <td class="table__cell child-name-cell">
+                            {{ item.child_item_name }}
+                            <input type="hidden" name="child_item_name[]" value="{{ item.child_item_name }}">
+                        </td>
+                        <td class="table__cell">
+                            <input type="text" name="child_item_code[]" placeholder="必填" required>
+                        </td>
+                        <td class="table__cell">
+                            <input type="text" name="batch_or_serial_no[]" placeholder="必填" required>
+                        </td>
+                        <td class="table__cell">
+                            <input type="date" name="expiration_date[]">
+                        </td>
+                        <td class="table__cell">
+                            <input type="number" name="quantity[]" step="0.01" min="0" placeholder="必填">
+                        </td>
+                        <td class="table__cell">
+                            <input type="text" name="unit[]" placeholder="必填">
+                        </td>
+                        <td class="table__cell">
+                            <input type="number" name="test_quantity[]" min="0" value="0">
+                        </td>
+                        <td class="table__cell">
+                            <input type="number" name="storage_temperature_c[]" step="0.1" placeholder="°C">
+                        </td>
+                        <td class="table__cell">
+                            <input type="text" name="storage_location[]" placeholder="位置">
+                        </td>
+                        <td class="table__cell table__cell--center">
+                            <input type="checkbox" name="has_toxic_chemical[]" value="{{ loop.index0 }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="submit-section">
+        <a href="{{ url_for('pages.add_data') }}" class="btn-back">← 回上一步</a>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn-submit">✓ 確認新增</button>
+        <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+            💡 品項貨號、批號、數量皆為必填，未填完整的列會自動跳過
+        </p>
+    </div>
+</form>
+
+{% endblock %}
