@@ -48,7 +48,7 @@
     <h3>貨物資料摘要</h3>
     <div class="summary-grid">
         <div class="summary-item">
-            <div class="summary-label">貨物名稱</div>
+            <div class="summary-label">主貨物名稱</div>
             <div class="summary-value">{{ data.parent_item_name }}</div>
         </div>
         <div class="summary-item">
@@ -68,7 +68,7 @@
             <div class="summary-value">{{ data.purchase_order_no or '-' }}</div>
         </div>
         <div class="summary-item">
-            <div class="summary-label">貨號</div>
+            <div class="summary-label">主貨物代號</div>
             <div class="summary-value">{{ data.parent_item_code or '-' }}</div>
         </div>
     </div>
@@ -92,8 +92,8 @@
                 <thead>
                     <tr>
                         <th class="table__cell table__cell--header">#</th>
-                        <th class="table__cell table__cell--header">單一品項名稱</th>
-                        <th class="table__cell table__cell--header">品項貨號 *</th>
+                        <th class="table__cell table__cell--header">子貨物名稱</th>
+                        <th class="table__cell table__cell--header">子貨物代號 *</th>
                         <th class="table__cell table__cell--header">批號/序列號 *</th>
                         <th class="table__cell table__cell--header">有效期限</th>
                         <th class="table__cell table__cell--header">數量 *</th>
@@ -151,7 +151,7 @@
         &nbsp;&nbsp;
         <button type="submit" class="btn-submit">✓ 確認新增</button>
         <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-            💡 品項貨號、批號、數量皆為必填，未填完整的列會自動跳過
+            💡 子貨物代號、批號、數量皆為必填，未填完整的列會自動跳過
         </p>
     </div>
 </form>
