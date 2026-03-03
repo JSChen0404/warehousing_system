@@ -93,7 +93,7 @@ def auth_callback():
         return redirect(url_for(".login"))
     claims = result["id_token_claims"]
     email = (claims.get("preferred_username") or claims.get("upn")
-             or claims.get("email") or "").lower()
+             or claims.get("email") or "")
     session["email"] = email
     session["azure_oid"] = claims.get("oid")
     session["name"] = claims.get("name")
@@ -453,6 +453,8 @@ def update_data():
 @login_required
 def create_withdrawal():
     form = WithdrawalForm()
+    if request.method == 'GET':
+        form.requester.data = session.get('email')
     if form.validate_on_submit():
         inv = _get_inventory(form.child_item_code.data, form.batch_or_serial_no.data)
         if not inv:
