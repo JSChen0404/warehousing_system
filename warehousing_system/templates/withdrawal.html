@@ -16,7 +16,7 @@
 
             <div class="form__hint">
                 <p>💡 填寫取貨申請後，需要經過審核人員批准才會扣除庫存</p>
-                <p>⚠️ 品項貨號與批號可在「庫存總覽」或「搜尋」頁面查詢</p>
+                <p>⚠️ 子貨物代號與批號可在「庫存總覽」或「搜尋」頁面查詢</p>
             </div>
 
             {{ form.hidden_tag() }}
@@ -26,7 +26,10 @@
                 {{ render_text_field(form.batch_or_serial_no) }}
                 {{ render_text_field(form.withdrawal_quantity) }}
                 {{ render_text_field(form.withdrawal_date) }}
-                {{ render_text_field(form.requester) }}
+                <div class="form__group">
+                    {{ form.requester.label(class_="form__label") }}
+                    {{ form.requester(class="form__field", readonly=True, style="background:#f5f5f5; cursor:not-allowed;") }}
+                </div>
 
                 <div class="form__group span-3">
                     {{ form.purpose.label(class_="form__label") }}

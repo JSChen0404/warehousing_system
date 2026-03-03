@@ -38,6 +38,19 @@
             border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
             text-decoration: none; display: inline-block;
         }
+        .btn-add-row {
+            padding: 0.1rem 0.45rem; background: #28a745; color: #fff;
+            border: none; border-radius: 4px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; line-height: 1; margin-left: 0.4rem; vertical-align: middle;
+        }
+        .btn-add-row:hover { background: #218838; }
+        .btn-del-row {
+            padding: 0.1rem 0.45rem; background: #dc3545; color: #fff;
+            border: none; border-radius: 4px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; line-height: 1; margin-left: 0.3rem; vertical-align: middle;
+        }
+        .btn-del-row:hover { background: #b02a37; }
+        .child-name-cell { display: flex; align-items: center; flex-wrap: wrap; gap: 0.2rem; }
     </style>
 {% endblock %}
 
@@ -81,14 +94,14 @@
     <section class="page-header">
         <h2>Step 2：填寫品項明細</h2>
         <p class="text-muted">
-            「{{ data.parent_item_name }}」共有 {{ items|length }} 個品項，請填寫各品項的詳細資料。
-            同一品項如有多個批號，請分別填寫多列。
+            「{{ data.parent_item_name }}」共有 {{ items|length }} 個子貨物，請填寫各子貨物的詳細資料。
+            同一子貨物如有多個批號/序列號，請分別填寫多列。
         </p>
     </section>
 
     <div class="table-wrapper">
         <div class="table-container">
-            <table class="table table-full" style="min-width: 1600px;">
+            <table id="items-table" class="table table-full" style="min-width: 1600px;">
                 <thead>
                     <tr>
                         <th class="table__cell table__cell--header">#</th>
@@ -107,10 +120,13 @@
                 <tbody>
                     {% for item in items %}
                     <tr>
-                        <td class="table__cell table__cell--center">{{ loop.index }}</td>
-                        <td class="table__cell child-name-cell">
-                            {{ item.child_item_name }}
-                            <input type="hidden" name="child_item_name[]" value="{{ item.child_item_name }}">
+                        <td class="table__cell table__cell--center row-num">{{ loop.index }}</td>
+                        <td class="table__cell">
+                            <div class="child-name-cell">
+                                <span>{{ item.child_item_name }}</span>
+                                <input type="hidden" name="child_item_name[]" value="{{ item.child_item_name }}">
+                                <button type="button" class="btn-add-row" onclick="addRow(this)" title="新增同名子貨物列">+</button>
+                            </div>
                         </td>
                         <td class="table__cell">
                             <input type="text" name="child_item_code[]" placeholder="必填" required>
@@ -155,5 +171,48 @@
         </p>
     </div>
 </form>
+
+<script>
+function addRow(button) {
+    const currentRow = button.closest('tr');
+    const newRow = currentRow.cloneNode(true);
+
+    // Clear all user-input values
+    newRow.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(function(input) {
+        input.value = '';
+    });
+    newRow.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = false;
+    });
+
+    // Add a delete button to the name cell of the new row
+    const nameDiv = newRow.querySelector('.child-name-cell');
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-del-row';
+    delBtn.title = '刪除此列';
+    delBtn.textContent = '×';
+    delBtn.onclick = function() { deleteRow(this); };
+    nameDiv.appendChild(delBtn);
+
+    currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+    renumberRows();
+}
+
+function deleteRow(button) {
+    button.closest('tr').remove();
+    renumberRows();
+}
+
+function renumberRows() {
+    document.querySelectorAll('#items-table tbody tr').forEach(function(row, index) {
+        const numCell = row.querySelector('.row-num');
+        if (numCell) numCell.textContent = index + 1;
+        // Keep checkbox value in sync with row position for server-side processing
+        const toxicCb = row.querySelector('input[name="has_toxic_chemical[]"]');
+        if (toxicCb) toxicCb.value = index;
+    });
+}
+</script>
 
 {% endblock %}
