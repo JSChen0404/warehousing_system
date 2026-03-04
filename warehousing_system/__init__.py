@@ -2,11 +2,13 @@ import os
 from flask import Flask, session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 
 
 load_dotenv()
 
 db = SQLAlchemy()
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
@@ -19,8 +21,9 @@ def create_app():
         "SECRET_KEY", "pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw"
     )
 
-    # 初始化 SQLAlchemy
+    # 初始化 SQLAlchemy 與 CSRF 保護
     db.init_app(app)
+    csrf.init_app(app)
 
     # 註冊藍圖
     from warehousing_system.routes import pages
