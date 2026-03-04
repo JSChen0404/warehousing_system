@@ -30,8 +30,10 @@
                 <a href="{{ url_for('pages.withdrawal_list') }}" class="sidebar-link">我的取貨單</a>
                 <!-- 僅審核人員可見 -->
                 {% if session.get('is_approver') %}
-                <a href="{{ url_for('pages.approval_list') }}" class="sidebar-link sidebar-link--approver">待審核 
-                    <span class="approval-badge" id="pendingCount"></span>
+                <a href="{{ url_for('pages.approval_list') }}" class="sidebar-link sidebar-link--approver">待審核
+                    {% if pending_count > 0 %}
+                    <span class="approval-badge">{{ pending_count }}</span>
+                    {% endif %}
                 </a>
                 {% endif %}
                 <a href="{{ url_for('pages.logout') }}" class="sidebar-link sidebar-link--logout">登出</a>
@@ -60,10 +62,12 @@
                 display: inline-block;
                 background: #dc3545;
                 color: #fff;
-                border-radius: 50%;
+                border-radius: 1rem;
                 padding: 0.1rem 0.5rem;
                 font-size: 0.75rem;
                 margin-left: 0.5rem;
+                min-width: 1.2rem;
+                text-align: center;
             }
         </style>
     </body>
