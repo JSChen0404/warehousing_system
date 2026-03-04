@@ -28,6 +28,20 @@
             {{ form.hidden_tag() }}
             {{ form.child_item_code() }}
 
+            {% if form.errors %}
+            <div style="background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+                        padding:0.75rem 1rem; border-radius:6px; margin-bottom:1rem; font-size:0.9rem;">
+                請修正以下錯誤後再送出：
+                <ul style="margin:0.25rem 0 0 1rem; padding:0;">
+                {% for field, errs in form.errors.items() %}
+                    {% for e in errs %}
+                        <li>{{ form[field].label.text }}：{{ e }}</li>
+                    {% endfor %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             <div class="form__grid">
                 <div class="form__group">
                     {{ form.batch_or_serial_no.label(class_="form__label") }}

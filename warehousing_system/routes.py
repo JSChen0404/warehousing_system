@@ -471,7 +471,7 @@ def get_inventory_by_batch(batch_no):
 def create_withdrawal():
     form = WithdrawalForm()
     if request.method == 'GET':
-        form.requester.data = session.get('name')
+        form.requester.data = session.get('name') or session.get('email', '')
     if form.validate_on_submit():
         # 優先用 hidden child_item_code（由 JS 填入）精確查詢，否則僅用批號
         code = form.child_item_code.data
