@@ -293,6 +293,8 @@ def search():
     per_page = 50
     pagination = None
 
+    searched = False
+
     if form.validate_on_submit():
         query = db.session.query(
             Inventory, PackingList
@@ -307,14 +309,15 @@ def search():
             conditions.append(PackingList.purchase_order_no.ilike(f"%{form.purchase_order_no.data}%"))
         if form.parent_item_name.data:
             conditions.append(PackingList.parent_item_name.ilike(f"%{form.parent_item_name.data}%"))
-        if form.child_item_name.data:
-            conditions.append(Inventory.child_item_name.ilike(f"%{form.child_item_name.data}%"))
+        if form.parent_item_code.data:
+            conditions.append(PackingList.parent_item_code.ilike(f"%{form.parent_item_code.data}%"))
         if form.child_item_code.data:
             conditions.append(Inventory.child_item_code.ilike(f"%{form.child_item_code.data}%"))
         if form.batch_or_serial_no.data:
             conditions.append(Inventory.batch_or_serial_no.ilike(f"%{form.batch_or_serial_no.data}%"))
 
         if conditions:
+            searched = True
             query = query.filter(or_(*conditions))
             pagination = query.order_by(
                 PackingList.arrival_date.desc(),
@@ -343,14 +346,12 @@ def search():
                     'received_by': inv.received_by,
                     'issue_date': inv.issue_date,
                 })
-            if not results:
-                flash("查無相關資料", "danger")
         else:
             flash("請至少填寫一個搜尋條件", "warning")
 
     return render_template(
         "search.html", title="搜尋資料",
-        form=form, results=results, pagination=pagination
+        form=form, results=results, pagination=pagination, searched=searched
     )
 
 

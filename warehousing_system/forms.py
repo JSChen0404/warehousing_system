@@ -39,7 +39,7 @@ class SearchForm(FlaskForm):
     packing_no = StringField('裝箱單號', validators=[Optional()])
     purchase_order_no = StringField('採購單號', validators=[Optional()])
     parent_item_name = StringField('主貨物名稱', validators=[Optional()])
-    child_item_name = StringField('子貨物名稱', validators=[Optional()])
+    parent_item_code = StringField('主貨物代號', validators=[Optional()])
     child_item_code = StringField('子貨物代號', validators=[Optional()])
     batch_or_serial_no = StringField('批號/序列號', validators=[Optional()])
     submit = SubmitField('搜尋')

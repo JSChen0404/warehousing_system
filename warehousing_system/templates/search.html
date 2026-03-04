@@ -22,12 +22,16 @@
             </div>
             <div class="form__row">
                 <div class="form__col">{{ render_text_field(form.parent_item_name) }}</div>
-                <div class="form__col">{{ render_text_field(form.child_item_name) }}</div>
+                <div class="form__col">{{ render_text_field(form.parent_item_code) }}</div>
                 <div class="form__col">{{ render_text_field(form.child_item_code) }}</div>
             </div>
             <div>{{ form.submit(class_="button button--form") }}</div>
         </div>
     </form>
+
+    {% if searched and not results %}
+    <script>alert('查無符合條件的資料，請嘗試其他搜尋條件。');</script>
+    {% endif %}
 
     {% if results %}
     <section class="page-header">

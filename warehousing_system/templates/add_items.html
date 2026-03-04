@@ -110,7 +110,7 @@
                         <th class="table__cell table__cell--header">批號/序列號 *</th>
                         <th class="table__cell table__cell--header">有效期限</th>
                         <th class="table__cell table__cell--header">數量 *</th>
-                        <th class="table__cell table__cell--header">單位 *</th>
+                        <th class="table__cell table__cell--header">單位</th>
                         <th class="table__cell table__cell--header">測試數</th>
                         <th class="table__cell table__cell--header">儲存條件(°C)</th>
                         <th class="table__cell table__cell--header">存放地點</th>
@@ -138,7 +138,7 @@
                             <input type="date" name="expiration_date[]">
                         </td>
                         <td class="table__cell">
-                            <input type="number" name="quantity[]" step="0.01" min="0" placeholder="必填">
+                            <input type="number" name="quantity[]" step="0.01" min="0" placeholder="必填" required>
                         </td>
                         <td class="table__cell">
                             <input type="text" name="unit[]" placeholder="必填">
@@ -167,7 +167,7 @@
         &nbsp;&nbsp;
         <button type="submit" class="btn-submit">✓ 確認新增</button>
         <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-            💡 子貨物代號、批號、數量皆為必填，未填完整的列會自動跳過
+            💡 子貨物代號（*）、批號/序列號（*）、數量（*）為必填，請確認每列皆已填寫完整
         </p>
     </div>
 </form>

@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" />
     <style>
         .form--withdrawal { max-width: 60rem; }
+        /* 鎖定3欄，讓取貨日期與申請人同行 */
+        @media (min-width: 64em) {
+            .form--withdrawal .form__grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 {% endblock %}
 
