@@ -16,15 +16,15 @@
                 <table class="table table-full">
                     <thead>
                         <tr>
+                            <th class="table__cell table__cell--header">裝箱單號</th>
+                            <th class="table__cell table__cell--header">採購單號</th>
+                            <th class="table__cell table__cell--header">到貨日</th>
+                            <th class="table__cell table__cell--header">實驗類別</th>                            
+                            <th class="table__cell table__cell--header">主貨物名稱</th> 
+                            <th class="table__cell table__cell--header">主貨物代號</th>
+                            <th class="table__cell table__cell--header">子貨物名稱</th>                                                                                                                                                                       
                             <th class="table__cell table__cell--header">子貨物代號</th>
                             <th class="table__cell table__cell--header">批號/序列號</th>
-                            <th class="table__cell table__cell--header">裝箱單號</th>
-                            <th class="table__cell table__cell--header">到貨日</th>
-                            <th class="table__cell table__cell--header">採購單號</th>
-                            <th class="table__cell table__cell--header">主貨物名稱</th>
-                            <th class="table__cell table__cell--header">實驗類別</th>
-                            <th class="table__cell table__cell--header">主貨物代號</th>
-                            <th class="table__cell table__cell--header">子貨物名稱</th>
                             <th class="table__cell table__cell--header">有效期限</th>
                             <th class="table__cell table__cell--header">數量</th>
                             <th class="table__cell table__cell--header">單位</th>
@@ -39,15 +39,15 @@
                     <tbody>
                         {% for item in inventories %}
                         <tr>
+                            <td class="table__cell">{{ item.packing_no }}</td>     
+                            <td class="table__cell">{{ item.purchase_order_no or '-' }}</td>
+                            <td class="table__cell">{{ item.arrival_date or '-' }}</td>    
+                            <td class="table__cell">{{ item.experiment_category or '-' }}</td> 
+                            <td class="table__cell">{{ item.parent_item_name or '-' }}</td>
+                            <td class="table__cell">{{ item.parent_item_code or '-' }}</td>  
+                            <td class="table__cell">{{ item.child_item_name or '-' }}</td>                                                                                                                                                                                        
                             <td class="table__cell">{{ item.child_item_code }}</td>
                             <td class="table__cell">{{ item.batch_or_serial_no }}</td>
-                            <td class="table__cell">{{ item.packing_no }}</td>
-                            <td class="table__cell">{{ item.arrival_date or '-' }}</td>
-                            <td class="table__cell">{{ item.purchase_order_no or '-' }}</td>
-                            <td class="table__cell">{{ item.parent_item_name or '-' }}</td>
-                            <td class="table__cell">{{ item.experiment_category or '-' }}</td>
-                            <td class="table__cell">{{ item.parent_item_code or '-' }}</td>
-                            <td class="table__cell">{{ item.child_item_name or '-' }}</td>
                             <td class="table__cell">{{ item.expiration_date or '-' }}</td>
                             <td class="table__cell table__cell--number">{{ "{:.2f}".format(item.quantity) }}</td>
                             <td class="table__cell">{{ item.unit }}</td>

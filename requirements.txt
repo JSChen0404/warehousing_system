@@ -8,3 +8,5 @@ python-dotenv
 passlib
 dataclasses
 msal
+pandas
+openpyxl
