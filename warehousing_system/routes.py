@@ -5,7 +5,7 @@ from flask import (Blueprint, render_template, request, redirect,
                    url_for, flash, session, jsonify)
 from flask_wtf.csrf import generate_csrf
 from warehousing_system.forms import (SearchForm, PackingListForm, UpdateQuantityForm,
-                                       WithdrawalForm, ApprovalForm)
+                                       WithdrawalForm, ApprovalForm, AddUserForm)
 from warehousing_system.models import (User, PackingList, Inventory, ProductCatalog,
                                         Withdrawal, Approval)
 from warehousing_system import db
@@ -99,11 +99,11 @@ def auth_callback():
     session["name"] = claims.get("name")
     user = User.query.filter_by(email=email).first()
     if not user:
-        user = User(email=email, password="oauth_user")
-        db.session.add(user)
-        db.session.commit()
+        session.clear()
+        flash(f"帳號 {email} 尚未授權，請聯繫管理員新增帳號後再登入。", "danger")
+        return redirect(url_for(".login"))
     session["is_approver"] = user.is_approver
-    flash("Login successful.", "success")
+    flash(f"登入成功，歡迎 {session.get('name') or email}！", "success")
     return redirect(url_for(".search"))
 
 @pages.route("/logout", methods=["GET"])
@@ -471,7 +471,7 @@ def get_inventory_by_batch(batch_no):
 def create_withdrawal():
     form = WithdrawalForm()
     if request.method == 'GET':
-        form.requester.data = session.get('name') or session.get('email', '')
+        form.requester.data = session.get('name')
     if form.validate_on_submit():
         # 優先用 hidden child_item_code（由 JS 填入）精確查詢，否則僅用批號
         code = form.child_item_code.data
@@ -601,3 +601,53 @@ def approve_withdrawal(withdrawal_id):
         "approval.html", title="審核取貨單",
         form=form, withdrawal=w, inventory=inv
     )
+
+
+# ─── 使用者管理 ─────────────────────────────────────────────────
+@pages.route("/users", methods=["GET", "POST"])
+@approver_required
+def user_management():
+    form = AddUserForm()
+    if form.validate_on_submit():
+        email_input = form.email.data.strip().lower()
+        if User.query.filter_by(email=email_input).first():
+            flash(f"帳號 {email_input} 已存在", "warning")
+        else:
+            new_user = User(email=email_input, password="oauth_user",
+                            is_approver=form.is_approver.data)
+            db.session.add(new_user)
+            db.session.commit()
+            flash(f"已新增使用者：{email_input}", "success")
+        return redirect(url_for(".user_management"))
+
+    users = User.query.order_by(User.email).all()
+    return render_template("user_management.html", title="使用者管理",
+                           form=form, users=users)
+
+
+@pages.route("/users/<int:user_id>/toggle_approver", methods=["POST"])
+@approver_required
+def toggle_approver(user_id):
+    user = User.query.get_or_404(user_id)
+    # 不能取消自己的審核權限
+    if user.email == session.get("email"):
+        flash("無法修改自己的權限", "warning")
+    else:
+        user.is_approver = not user.is_approver
+        db.session.commit()
+        status = "已授予" if user.is_approver else "已移除"
+        flash(f"{user.email} 審核權限{status}", "success")
+    return redirect(url_for(".user_management"))
+
+
+@pages.route("/users/<int:user_id>/delete", methods=["POST"])
+@approver_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.email == session.get("email"):
+        flash("無法刪除自己的帳號", "warning")
+    else:
+        db.session.delete(user)
+        db.session.commit()
+        flash(f"已刪除使用者：{user.email}", "success")
+    return redirect(url_for(".user_management"))

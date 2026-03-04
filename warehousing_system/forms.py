@@ -67,6 +67,13 @@ class WithdrawalForm(FlaskForm):
     submit = SubmitField('提交取貨申請')
 
 
+class AddUserForm(FlaskForm):
+    """新增使用者表單"""
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    is_approver = BooleanField('具有審核權限')
+    submit = SubmitField('新增使用者')
+
+
 class ApprovalForm(FlaskForm):
     """審核表單"""
     approval_status = SelectField(

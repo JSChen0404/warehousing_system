@@ -35,6 +35,7 @@
                     <span class="approval-badge">{{ pending_count }}</span>
                     {% endif %}
                 </a>
+                <a href="{{ url_for('pages.user_management') }}" class="sidebar-link sidebar-link--approver">使用者管理</a>
                 {% endif %}
                 <a href="{{ url_for('pages.logout') }}" class="sidebar-link sidebar-link--logout">登出</a>
             </nav>
