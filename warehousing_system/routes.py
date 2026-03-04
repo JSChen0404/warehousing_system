@@ -449,25 +449,48 @@ def update_data():
     return render_template("update_data.html", title="更新資料", form=form, results=results)
 
 
+# ─── API：依批號查詢庫存 ────────────────────────────────────────
+@pages.route("/api/inventory_by_batch/<path:batch_no>", methods=["GET"])
+@login_required
+def get_inventory_by_batch(batch_no):
+    inv = Inventory.query.filter_by(batch_or_serial_no=batch_no).first()
+    if inv:
+        return jsonify({
+            'found': True,
+            'child_item_code': inv.child_item_code,
+            'child_item_name': inv.child_item_name or '',
+            'quantity': float(inv.quantity) if inv.quantity else 0,
+            'unit': inv.unit or '',
+        })
+    return jsonify({'found': False})
+
+
 # ─── 取貨單 ────────────────────────────────────────────────────
 @pages.route("/withdrawal", methods=["GET", "POST"])
 @login_required
 def create_withdrawal():
     form = WithdrawalForm()
     if request.method == 'GET':
-        form.requester.data = session.get('email')
+        form.requester.data = session.get('name')
     if form.validate_on_submit():
-        inv = _get_inventory(form.child_item_code.data, form.batch_or_serial_no.data)
+        # 優先用 hidden child_item_code（由 JS 填入）精確查詢，否則僅用批號
+        code = form.child_item_code.data
+        batch = form.batch_or_serial_no.data
+        inv = (_get_inventory(code, batch) if code
+               else Inventory.query.filter_by(batch_or_serial_no=batch).first())
         if not inv:
-            flash("找不到對應的庫存項目（請確認品項貨號與批號）", "danger")
+            flash("找不到此批號，請確認批號是否正確", "danger")
+            return redirect(url_for(".create_withdrawal"))
+        if form.withdrawal_quantity.data <= 0:
+            flash("取貨數量必須大於 0", "danger")
             return redirect(url_for(".create_withdrawal"))
         if float(inv.quantity) < form.withdrawal_quantity.data:
-            flash(f"庫存數量不足。目前庫存：{inv.quantity} {inv.unit}", "danger")
+            flash(f"庫存數量不足，目前庫存：{inv.quantity} {inv.unit}", "danger")
             return redirect(url_for(".create_withdrawal"))
 
         w = Withdrawal(
-            child_item_code=form.child_item_code.data,
-            batch_or_serial_no=form.batch_or_serial_no.data,
+            child_item_code=inv.child_item_code,
+            batch_or_serial_no=inv.batch_or_serial_no,
             withdrawal_quantity=form.withdrawal_quantity.data,
             withdrawal_date=form.withdrawal_date.data,
             requester=form.requester.data,

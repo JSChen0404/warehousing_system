@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, IntegerField, FloatField, DateField,
-                     SubmitField, PasswordField, SelectField, TextAreaField, BooleanField)
+                     SubmitField, PasswordField, SelectField, TextAreaField, BooleanField, HiddenField)
 from wtforms.validators import DataRequired, Length, NumberRange, EqualTo, Email, Optional
 
 
@@ -57,8 +57,9 @@ class UpdateQuantityForm(FlaskForm):
 
 class WithdrawalForm(FlaskForm):
     """取貨單表單"""
-    child_item_code = StringField('子貨物代號', validators=[DataRequired()])
     batch_or_serial_no = StringField('批號/序列號', validators=[DataRequired()])
+    child_item_name = StringField('子貨物名稱', validators=[Optional()])   # 自動填入，顯示用
+    child_item_code = HiddenField()                                         # 由 JS 自動填入
     withdrawal_quantity = FloatField('取貨數量', validators=[DataRequired(), NumberRange(min=0)])
     withdrawal_date = DateField('取貨日期', format='%Y-%m-%d', validators=[DataRequired()])
     requester = StringField('申請人', validators=[DataRequired()])

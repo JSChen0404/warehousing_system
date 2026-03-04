@@ -22,14 +22,29 @@
 
             <div class="form__hint">
                 <p>💡 填寫取貨申請後，需要經過審核人員批准才會扣除庫存</p>
-                <p>⚠️ 子貨物代號與批號可在「庫存總覽」或「搜尋」頁面查詢</p>
+                <p>⚠️ 批號可在「庫存總覽」或「搜尋」頁面查詢；輸入批號後系統將自動帶出子貨物名稱</p>
             </div>
 
             {{ form.hidden_tag() }}
+            {{ form.child_item_code() }}
 
             <div class="form__grid">
-                {{ render_text_field(form.child_item_code) }}
-                {{ render_text_field(form.batch_or_serial_no) }}
+                <div class="form__group">
+                    {{ form.batch_or_serial_no.label(class_="form__label") }}
+                    {{ form.batch_or_serial_no(class="form__field", id="batch_input", autocomplete="off") }}
+                    {% for error in form.batch_or_serial_no.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                    <span id="batch-status" style="font-size:0.8rem; margin-top:0.25rem;"></span>
+                </div>
+
+                <div class="form__group">
+                    {{ form.child_item_name.label(class_="form__label") }}
+                    {{ form.child_item_name(class="form__field", id="child_item_name_display",
+                        readonly=True, style="background:#f5f5f5; cursor:not-allowed;",
+                        placeholder="輸入批號後自動填入") }}
+                </div>
+
                 {{ render_text_field(form.withdrawal_quantity) }}
                 {{ render_text_field(form.withdrawal_date) }}
                 <div class="form__group">
@@ -46,9 +61,51 @@
                 </div>
 
                 <div class="span-3">
-                    {{ form.submit(class_="button button--form") }}
+                    {{ form.submit(class_="button button--form", id="submit-btn") }}
                 </div>
             </div>
+
+            <script>
+            (function () {
+                const batchInput = document.getElementById('batch_input');
+                const nameDisplay = document.getElementById('child_item_name_display');
+                const codeHidden = document.getElementById('child_item_code');
+                const statusEl = document.getElementById('batch-status');
+                const submitBtn = document.getElementById('submit-btn');
+
+                function lookup() {
+                    const batch = batchInput.value.trim();
+                    if (!batch) {
+                        nameDisplay.value = '';
+                        codeHidden.value = '';
+                        statusEl.textContent = '';
+                        return;
+                    }
+                    fetch('/api/inventory_by_batch/' + encodeURIComponent(batch))
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.found) {
+                                nameDisplay.value = data.child_item_name;
+                                codeHidden.value = data.child_item_code;
+                                statusEl.style.color = '#28a745';
+                                statusEl.textContent = '✓ 找到庫存：可用數量 ' + data.quantity + ' ' + data.unit;
+                            } else {
+                                nameDisplay.value = '';
+                                codeHidden.value = '';
+                                statusEl.style.color = '#dc3545';
+                                statusEl.textContent = '✗ 找不到此批號';
+                            }
+                        })
+                        .catch(() => {
+                            statusEl.style.color = '#dc3545';
+                            statusEl.textContent = '查詢失敗，請稍後再試';
+                        });
+                }
+
+                batchInput.addEventListener('blur', lookup);
+                batchInput.addEventListener('change', lookup);
+            })();
+            </script>
         </div>
     </form>
 
