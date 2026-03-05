@@ -50,6 +50,8 @@ def login_required(route):
         return route(*args, **kwargs)
     return wrapper
 
+ADMIN_EMAIL = "novascope.dba@novascopedx.com"
+
 def approver_required(route):
     @functools.wraps(route)
     def wrapper(*args, **kwargs):
@@ -58,6 +60,17 @@ def approver_required(route):
         user = User.query.filter_by(email=session.get("email")).first()
         if not user or not user.is_approver:
             flash("您沒有審核權限", "danger")
+            return redirect(url_for("pages.index"))
+        return route(*args, **kwargs)
+    return wrapper
+
+def admin_required(route):
+    @functools.wraps(route)
+    def wrapper(*args, **kwargs):
+        if not session.get("email"):
+            return redirect(url_for("pages.login"))
+        if session.get("email").lower() != ADMIN_EMAIL:
+            flash("您沒有管理員權限", "danger")
             return redirect(url_for("pages.index"))
         return route(*args, **kwargs)
     return wrapper
@@ -605,7 +618,7 @@ def approve_withdrawal(withdrawal_id):
 
 # ─── 使用者管理 ─────────────────────────────────────────────────
 @pages.route("/users", methods=["GET", "POST"])
-@approver_required
+@admin_required
 def user_management():
     form = AddUserForm()
     if form.validate_on_submit():
@@ -626,7 +639,7 @@ def user_management():
 
 
 @pages.route("/users/<int:user_id>/toggle_approver", methods=["POST"])
-@approver_required
+@admin_required
 def toggle_approver(user_id):
     user = User.query.get_or_404(user_id)
     # 不能取消自己的審核權限
@@ -641,7 +654,7 @@ def toggle_approver(user_id):
 
 
 @pages.route("/users/<int:user_id>/delete", methods=["POST"])
-@approver_required
+@admin_required
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     if user.email == session.get("email"):
